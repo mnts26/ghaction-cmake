@@ -1,0 +1,50 @@
+---
+name: execpermfix
+on: push
+jobs:
+  build:
+    strategy:
+        matrix:
+          compiler:
+            - gcc
+            - clang
+    runs-on: ubuntu-latest
+    env:
+      CC: ${{ matrix.compiler }}
+    steps:
+      - uses: actions/checkout@master
+      - uses: ./
+        with:
+          dependencies_debian: libx11-dev xterm
+          directory: execpermfix
+  coverage:
+    runs-on: ubuntu-latest
+    env:
+      externa_lpenz_env: ohyeah
+    steps:
+      - uses: actions/checkout@master
+      - uses: ./
+        with:
+          directory: execpermfix
+          preset: coverage
+          coverage: codecov
+  presets:
+    strategy:
+        matrix:
+          preset: 
+            - clang-tidy
+            - iwyu
+            - cppcheck
+            - clang-sanitize-address
+            - clang-sanitize-memory
+            - clang-sanitize-undefined
+            - clang-sanitize-dataflow
+            - clang-sanitize-safe-stack
+            - valgrind
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: ./
+        with:
+          directory: execpermfix
+          preset: ${{ matrix.preset }}
